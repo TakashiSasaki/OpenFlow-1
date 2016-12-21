@@ -1,0 +1,3 @@
+run:
+	../../waf --run OpenFlow
+
