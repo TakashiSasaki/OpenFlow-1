@@ -122,7 +122,8 @@ VlanController::EnumeratePortsWithoutInport (const ns3::Ptr<ns3::OpenFlowSwitchN
 }
 
 void
-VlanController::MirroringToIds (sw_flow_key key, ofp_packet_in* opi, ns3::Ptr<ns3::OpenFlowSwitchNetDevice> swtch, ofpbuf* buffer, std::vector<int> v)
+VlanController::MirroringToIds (sw_flow_key key, ofp_packet_in* opi, ns3::Ptr<ns3::OpenFlowSwitchNetDevice> swtch, 
+				ofpbuf* buffer, std::vector<int> v)
 {
 	ns3::Mac48Address dst_addr;
 	dst_addr.CopyFrom (key.flow.dl_dst);
@@ -190,7 +191,9 @@ VlanController::MirroringToIds (sw_flow_key key, ofp_packet_in* opi, ns3::Ptr<ns
 //		memcpy(acts + dl_offset, dl, sizeof(dl));
 		memcpy(acts + x_offset, x, sizeof(x));
 
-		ofp_flow_mod* ofm = ns3::ofi::Controller::BuildFlow (key, opi->buffer_id, OFPFC_ADD, acts, sizeof(acts), OFP_FLOW_PERMANENT, m_expirationTime.IsZero () ? OFP_FLOW_PERMANENT : m_expirationTime.GetSeconds ());
+		ofp_flow_mod* ofm = ns3::ofi::Controller::BuildFlow 
+			(key, opi->buffer_id, OFPFC_ADD, acts, sizeof(acts), OFP_FLOW_PERMANENT, 
+			 m_expirationTime.IsZero () ? OFP_FLOW_PERMANENT : m_expirationTime.GetSeconds ());
 		ns3::ofi::Controller::SendToSwitch (swtch, ofm, ofm->header.length);
 	}
 }
@@ -227,7 +230,9 @@ VlanController::ReceiveFromSwitch (ns3::Ptr<ns3::OpenFlowSwitchNetDevice> swtch,
 			v[0].len = htons (sizeof(ofp_action_vlan_vid));
 			v[0].vlan_vid = vid;
 
-			ofp_flow_mod* ofm = ns3::ofi::Controller::BuildFlow (key, -1, OFPFC_ADD, v, sizeof(v), OFP_FLOW_PERMANENT, m_expirationTime.IsZero () ? OFP_FLOW_PERMANENT : m_expirationTime.GetSeconds ());
+			ofp_flow_mod* ofm = ns3::ofi::Controller::BuildFlow 
+				(key, -1, OFPFC_ADD, v, sizeof(v), OFP_FLOW_PERMANENT, 
+				 m_expirationTime.IsZero () ? OFP_FLOW_PERMANENT : m_expirationTime.GetSeconds ());
 			ns3::ofi::Controller::SendToSwitch (swtch, ofm, ofm->header.length);
 
 			NS_LOG_INFO ("Set VLAN ID : switch=" << swtch << ", port=" << port << ", VLAN ID=" << vid);
@@ -268,7 +273,8 @@ VlanController::ReceiveFromSwitch (ns3::Ptr<ns3::OpenFlowSwitchNetDevice> swtch,
 				x[0].port = out_port;
 
 				// Create a new flow
-				ofp_flow_mod* ofm = ns3::ofi::Controller::BuildFlow (key, opi->buffer_id, OFPFC_ADD, x, sizeof(x), OFP_FLOW_PERMANENT, 1);
+				ofp_flow_mod* ofm = ns3::ofi::Controller::BuildFlow 
+					(key, opi->buffer_id, OFPFC_ADD, x, sizeof(x), OFP_FLOW_PERMANENT, 1);
 				ns3::ofi::Controller::SendToSwitch (swtch, ofm, ofm->header.length);
 
 				VlanController::MirroringToIds (key, opi, swtch, buffer, v);
@@ -291,7 +297,9 @@ assert(vid != 4095);
 					x[i].port = v[i];
 				}
 
-				ofp_flow_mod* ofm = ns3::ofi::Controller::BuildFlow (key, opi->buffer_id, OFPFC_ADD, x, sizeof(x), OFP_FLOW_PERMANENT, m_expirationTime.IsZero() ? OFP_FLOW_PERMANENT : m_expirationTime.GetSeconds ());
+				ofp_flow_mod* ofm = ns3::ofi::Controller::BuildFlow 
+					(key, opi->buffer_id, OFPFC_ADD, x, sizeof(x), OFP_FLOW_PERMANENT, 
+					 m_expirationTime.IsZero() ? OFP_FLOW_PERMANENT : m_expirationTime.GetSeconds ());
 
 				ns3::ofi::Controller::SendToSwitch (swtch, ofm, ofm->header.length);
 			}
@@ -310,7 +318,9 @@ assert(vid != 4095);
 				x[i].port = v[i];
 			}
 
-			ofp_flow_mod* ofm = ns3::ofi::Controller::BuildFlow (key, opi->buffer_id, OFPFC_ADD, x, sizeof(x), OFP_FLOW_PERMANENT, m_expirationTime.IsZero () ? OFP_FLOW_PERMANENT : m_expirationTime.GetSeconds ());
+			ofp_flow_mod* ofm = ns3::ofi::Controller::BuildFlow 
+				(key, opi->buffer_id, OFPFC_ADD, x, sizeof(x), OFP_FLOW_PERMANENT, 
+				 m_expirationTime.IsZero () ? OFP_FLOW_PERMANENT : m_expirationTime.GetSeconds ());
 			ns3::ofi::Controller::SendToSwitch (swtch, ofm, ofm->header.length);
 
 		}
@@ -344,7 +354,9 @@ assert(vid != 4095);
 			src_addr.CopyTo (key.flow.dl_dst);
 			dst_addr.CopyTo (key.flow.dl_src);
 			key.flow.in_port = out_port;
-			ofp_flow_mod* ofm2 = ns3::ofi::Controller::BuildFlow (key, -1, OFPFC_ADD, x2, sizeof(x2), OFP_FLOW_PERMANENT, m_expirationTime.IsZero () ? OFP_FLOW_PERMANENT : m_expirationTime.GetSeconds ());
+			ofp_flow_mod* ofm2 = ns3::ofi::Controller::BuildFlow 
+				(key, -1, OFPFC_ADD, x2, sizeof(x2), OFP_FLOW_PERMANENT, 
+				 m_expirationTime.IsZero () ? OFP_FLOW_PERMANENT : m_expirationTime.GetSeconds ());
 			ns3::ofi::Controller::SendToSwitch (swtch, ofm2, ofm2->header.length);
 	}
 }
