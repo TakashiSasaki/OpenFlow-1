@@ -1,5 +1,4 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
-/*
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */ /*
  * Network topology is the same as "src/openflow/examples/openflow-switch.cc"
  */
 
@@ -9,6 +8,7 @@
 #include "ns3/core-module.h"
 #include "ns3/network-module.h"
 #include "ns3/csma-module.h"
+#include "ns3/bridge-module.h"
 #include "ns3/internet-module.h"
 #include "ns3/applications-module.h"
 #include "ns3/openflow-module.h"
@@ -47,10 +47,73 @@ SetTimeout (std::string value)
 	return false;
 }
 
+int
+main (int argc, char *argv[])
+{
+    ns3::NodeContainer node_container;
+    node_container.Create(3);
+
+    ns3::CsmaHelper csma_helper;
+    csma_helper.SetChannelAttribute ("DataRate", ns3::DataRateValue (5000000));
+    csma_helper.SetChannelAttribute ("Delay", ns3::TimeValue (ns3::MilliSeconds (2)));
+    
+    ns3::NetDeviceContainer net_device_container1 = csma_helper.Install(ns3::NodeContainer(node_container.Get(0), node_container.Get(1)));
+    ns3::NetDeviceContainer net_device_container2 = csma_helper.Install(ns3::NodeContainer(node_container.Get(1), node_container.Get(2)));
+
+    std::cerr << node_container.Get(1)->GetDevice(0)->GetTypeId() << " " <<  node_container.Get(1)->GetDevice(0) << std::endl; 
+    std::cerr << node_container.Get(1)->GetDevice(1)->GetTypeId() << " " << node_container.Get(1)->GetDevice(1) << std::endl; 
+    std::cerr << net_device_container1.Get(1)->GetTypeId() << " " << net_device_container1.Get(1) << std::endl;
+    std::cerr << net_device_container2.Get(0)->GetTypeId() << " " << net_device_container2.Get(0) << std::endl;
+
+    ns3::InternetStackHelper internet;
+    internet.Install (ns3::NodeContainer(node_container.Get(0), node_container.Get(2)));
+
+    ns3::Ipv4AddressHelper ipv4;
+    ipv4.SetBase ("10.1.1.0", "255.255.255.0");
+    ipv4.Assign (ns3::NetDeviceContainer(net_device_container1.Get(0), net_device_container2.Get(1)));
+
+    ns3::OnOffHelper onoff ("ns3::UdpSocketFactory", ns3::Address (ns3::InetSocketAddress (ns3::Ipv4Address ("10.1.1.2"), 9)));
+    onoff.SetConstantRate (ns3::DataRate ("500kb/s"));
+    ns3::ApplicationContainer on_off_app = onoff.Install (node_container.Get (0));
+    on_off_app.Start (ns3::Seconds (0.0));
+    on_off_app.Stop (ns3::Seconds (10.0));
+
+    ns3::PacketSinkHelper sink ("ns3::UdpSocketFactory", ns3::Address (ns3::InetSocketAddress (ns3::Ipv4Address::GetAny(), 9)));
+    ns3::ApplicationContainer sink_app = sink.Install (node_container.Get (2));
+    sink_app.Start (ns3::Seconds (0.0));
+    sink_app.Stop (ns3::Seconds (10.0));
+
+    //ns3::BridgeHelper bridge_helper;
+    //bridge_helper.Install(node_container.Get(1), ns3::NetDeviceContainer(net_device_container1.Get(1), net_device_container2.Get(0)));
+
+    ns3::Ptr<VlanController> controller = ns3::CreateObject<VlanController> ();
+    //ns3::Ptr<ns3::ofi::LearningController> controller = ns3::CreateObject<ns3::ofi::LearningController> ();
+    ns3::OpenFlowSwitchHelper open_flow_switch_helper;
+
+
+    open_flow_switch_helper.Install (node_container.Get(1), ns3::NetDeviceContainer(
+                                       ns3::NetDeviceContainer(node_container.Get(1)->GetDevice(0)), 
+                                       ns3::NetDeviceContainer(node_container.Get(1)->GetDevice(1))
+                                     ), controller);
+    controller->SetVlanId(net_device_container1.Get(1)->GetObject<ns3::OpenFlowSwitchNetDevice>(), 0, 123);
+    controller->SetVlanId(net_device_container2.Get(0)->GetObject<ns3::OpenFlowSwitchNetDevice>(), 1, 123);
+
+    std::cerr << node_container.Get(1)->GetDevice(0)->GetTypeId() << " " <<  node_container.Get(1)->GetDevice(0) << std::endl; 
+    std::cerr << node_container.Get(1)->GetDevice(1)->GetTypeId() << " " << node_container.Get(1)->GetDevice(1) << std::endl; 
+    std::cerr << net_device_container1.Get(1)->GetTypeId() << " " << net_device_container1.Get(1) << std::endl;
+    std::cerr << net_device_container2.Get(0)->GetTypeId() << " " << net_device_container2.Get(0) << std::endl;
+
+    csma_helper.EnablePcapAll ("test123", false);
+    ns3::AsciiTraceHelper ascii;
+    csma_helper.EnableAsciiAll (ascii.CreateFileStream ("test123.tr"));
+    ns3::Simulator::Run();
+    ns3::Simulator::Destroy();
+    return EXIT_SUCCESS;
+}
 
 
 int
-main (int argc, char *argv[])
+mainmain (int argc, char *argv[])
 {	
 	ns3::CommandLine cmd;
 	cmd.AddValue ("verbose", "Verbose (turns on logging).", ns3::MakeCallback (&SetVerbose));
@@ -288,4 +351,5 @@ main (int argc, char *argv[])
 	ns3::Simulator::Run ();
 	ns3::Simulator::Destroy ();
 	NS_LOG_INFO ("Done.");
+        return EXIT_SUCCESS;
 }
