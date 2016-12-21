@@ -106,6 +106,10 @@ main (int argc, char *argv[])
     csma_helper.EnablePcapAll ("test123", false);
     ns3::AsciiTraceHelper ascii;
     csma_helper.EnableAsciiAll (ascii.CreateFileStream ("test123.tr"));
+    ns3::LogComponentEnable ("VlanController", ns3::LOG_LEVEL_INFO);
+    ns3::LogComponentEnable ("VlanControllerTest", ns3::LOG_LEVEL_INFO);
+    ns3::LogComponentEnable ("OpenFlowInterface", ns3::LOG_LEVEL_INFO);
+    ns3::LogComponentEnable ("OpenFlowSwitchNetDevice", ns3::LOG_LEVEL_INFO);
     ns3::Simulator::Run();
     ns3::Simulator::Destroy();
     return EXIT_SUCCESS;
