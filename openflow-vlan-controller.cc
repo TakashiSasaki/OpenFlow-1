@@ -222,6 +222,9 @@ VlanController::ReceiveFromSwitch (ns3::Ptr<ns3::OpenFlowSwitchNetDevice> swtch,
 		key.wildcards = 0;
 		flow_extract (buffer, port != -1 ? port : OFPP_NONE, &key.flow);
 		uint16_t vid = key.flow.dl_vlan;
+		
+//		NS_LOG_INFO("dl_type: " << key.flow.dl_type);
+//		NS_LOG_INFO("dl_vlan: " << key.flow.dl_vlan);
 
 		// Set VLAN ID, if buffer do not have VLAN ID
 		if (vid == OFP_VLAN_NONE)
@@ -280,7 +283,7 @@ VlanController::ReceiveFromSwitch (ns3::Ptr<ns3::OpenFlowSwitchNetDevice> swtch,
 					(key, opi->buffer_id, OFPFC_ADD, x, sizeof(x), OFP_FLOW_PERMANENT, 1);
 				ns3::ofi::Controller::SendToSwitch (swtch, ofm, ofm->header.length);
 
-				VlanController::MirroringToIds (key, opi, swtch, buffer, v);
+//				VlanController::MirroringToIds (key, opi, swtch, buffer, v);
 			}
 else{
 assert(vid != 4095);
