@@ -201,6 +201,7 @@ VlanController::MirroringToIds (sw_flow_key key, ofp_packet_in* opi, ns3::Ptr<ns
 void
 VlanController::ReceiveFromSwitch (ns3::Ptr<ns3::OpenFlowSwitchNetDevice> swtch, ofpbuf* buffer)
 {
+        NS_LOG_INFO("ReceiveFromSwitch\t: received an openflow message from switch " << swtch);
 	if (m_switches.find (swtch) == m_switches.end ())
 	{
 		NS_LOG_ERROR ("Can't receive from this switch, not registered to the Controller.");
@@ -208,6 +209,7 @@ VlanController::ReceiveFromSwitch (ns3::Ptr<ns3::OpenFlowSwitchNetDevice> swtch,
 	}
 	// We have received any packet at this point, so we pull the header to figure out what type of packet we're handling.
 	uint8_t type = ns3::ofi::Controller::GetPacketType (buffer);
+        NS_LOG_INFO("ReceiveFromSwitch\t: packet type = " << (int)type);
 
 	if (type == OFPT_PACKET_IN) // The switch didn't understand the packet it received, so it forwarded it to the controller.
 	{
