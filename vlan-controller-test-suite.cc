@@ -52,6 +52,13 @@ main (int argc, char *argv[])
 {
     ns3::NodeContainer node_container;
     node_container.Create(3);
+    ns3::Names::Add("left_node", node_container.Get(0));
+    ns3::Names::Add("openflow_switch", node_container.Get(1));
+    ns3::Names::Add("right_node", node_container.Get(2));
+    std::cerr << "main\t: create three nodes" << std::endl;
+    std::cerr << "main\t: " << node_container.Get(0)  << std::endl;
+    std::cerr << "main\t: " << node_container.Get(1) << std::endl;
+    std::cerr << "main\t: " << node_container.Get(2) << std::endl;
 
     ns3::CsmaHelper csma_helper;
     csma_helper.SetChannelAttribute ("DataRate", ns3::DataRateValue (5000000));

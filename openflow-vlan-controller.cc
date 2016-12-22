@@ -58,12 +58,12 @@ VlanController::GetVlanId (const ns3::Ptr<ns3::OpenFlowSwitchNetDevice> swtch, c
 		}
 		else
 		{	
-			NS_LOG_ERROR("port not found: switch = " << swtch << ", port = " << port << ".");
+			NS_LOG_ERROR("GetVlanId\t: port not found: switch = " << swtch << ", port = " << port << ".");
 		}
 	}
 	else
 	{
-		NS_LOG_ERROR("GetVlanId: switch not found: switch = " << swtch << ", port = " << port << ".");
+		NS_LOG_ERROR("GetVlanId\t: switch not found: switch = " << swtch << ", port = " << port << ".");
 	}
 	return vid;
 }
@@ -84,13 +84,13 @@ VlanController::EnumeratePorts (const ns3::Ptr<ns3::OpenFlowSwitchNetDevice> swt
 			}
 			else
 			{
-				NS_LOG_INFO ("port not found: This switch(" << swtch << ") has no port with VID(" << vid << ")");
+				NS_LOG_INFO ("GetVlanId\t: port not found: This switch(" << swtch << ") has no port with VID(" << vid << ")");
 			}
 		}
 	}
 	else
 	{
-		NS_LOG_INFO ("EnumeratePorts: switch not found: This switch(" << swtch << ") does not exist");
+		NS_LOG_INFO ("EnumeratePorts\t: switch not found: This switch(" << swtch << ") does not exist");
 	}
 	return v;
 }
@@ -213,6 +213,7 @@ VlanController::ReceiveFromSwitch (ns3::Ptr<ns3::OpenFlowSwitchNetDevice> swtch,
 
 	if (type == OFPT_PACKET_IN) // The switch didn't understand the packet it received, so it forwarded it to the controller.
 	{
+                NS_LOG_INFO("ReceiveFromSwitch\t: type==OFPT_PACKET_IN");
 		ofp_packet_in * opi = (ofp_packet_in*)ofpbuf_try_pull (buffer, offsetof (ofp_packet_in, data));
 		int port = ntohs (opi->in_port);
 
